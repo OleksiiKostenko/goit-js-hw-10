@@ -1,26 +1,58 @@
 const listEl = document.querySelector('.country-list');
 const wrappEl = document.querySelector('.country-info');
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+const ENDPOINT = 'https://restcountries.com/v3.1/name/';
 
-// fetchCountries(name);
+function fetchCountries(searchData) {
+  fetch(`${ENDPOINT}/${searchData}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(response.status);
+      }
+      console.log(response);
+      return response.json();
+    })
+    .then(countries => {
+      clearEl();
+      console.log(countries);
+      if (countries.length > 10) {
+        return Notify.info(
+          'Too many matches found. Please enter a more specific name.'
+        );
+      } else if (countries.length >= 2 && countries.length <= 10) {
+        return countries.map(createMarkupNameAndFlag);
+      } else if (countries.length === 1) {
+        return (
+          createMarkupCountrysInfo(countries) +
+          countries.map(createMarkupNameAndFlag)
+        );
+      }
+    })
+    .catch(error => {
+      Notify.failure('Oops, there is no country with that name');
+      clearEl();
+    });
+}
 
-const url = fetch('https://restcountries.com/v3.1/name/peru')
-  .then(response => {
-    console.log(response);
-    return response.json();
-  })
-  .then(countrys => {
-    console.log(countrys[0]);
-    const country = countrys[0];
-    const countriesInfo = `<img src="${country.flags.svg}"   width="100"
-     height="50" alt="${country.flags.alt}" /><h1>${country.name.official}</h1>`;
-    const countriesList = ` <li><h2>Capital:</h2><p>${country.capital}</p></li>
-        <li><h2>Population:</h2><p>${country.population}</p></li>
-        <li><h2>Languages:</h2><p>${Object.values(country.languages)}</p></li>`;
-    wrappEl.insertAdjacentHTML('beforeend', countriesInfo);
-    listEl.insertAdjacentHTML('beforeend', countriesList);
-  })
-  .catch(error => {
-    console.log(error);
+function createMarkupNameAndFlag(country) {
+  const { name, flags } = country;
+  const countriesInfo = `<img src="${flags.svg}"   width="200"
+     height="100" alt="${flags.alt}" /><h1>${name.official}</h1>`;
+  return wrappEl.insertAdjacentHTML('beforeend', countriesInfo);
+}
+function createMarkupCountrysInfo(countries) {
+  return countries.map(country => {
+    const { capital, population, languages } = country;
+    const countriesList = ` <li class="country-list-item"><h2>Capital:</h2><p>${capital}</p></li>
+        <li class="country-list-item"><h2>Population:</h2><p>${population}</p></li>
+        <li class="country-list-item"><h2>Languages:</h2><p>${Object.values(
+          languages
+        )}</p></li>`;
+    return listEl.insertAdjacentHTML('beforeend', countriesList);
   });
-
-export { fetchCountries };
+}
+function clearEl() {
+  wrappEl.innerHTML = '';
+  listEl.innerHTML = '';
+}
+export { fetchCountries, clearEl };

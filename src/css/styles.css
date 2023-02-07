@@ -10,11 +10,36 @@ body {
   background-color: #fafafa;
   color: #212121;
   line-height: 1.5;
+  
 }
 
 #search-box {
+  margin-left: 80px;
+  margin-top: 40px;
   font: inherit;
   padding: 8px;
   max-width: 320px;
   margin-bottom: 16px;
+}
+.wrapp{
+display: flex;
+flex-direction: row-reverse;
+justify-content: flex-end;
+align-items: center;
+}
+
+
+.country-list{
+margin-left: 60px;
+}
+
+.country-info{
+display: flex;
+flex-direction: column;
+align-items: center;
+margin-left: 60px;
+}
+.country-list-item{
+margin-right: 40px;
+list-style: none;
 }
